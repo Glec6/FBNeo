@@ -1,0 +1,31 @@
+name: Build FBNeo PS4 Core
+
+on:
+  workflow_dispatch: # Allows you to manually trigger the build from the GitHub UI
+
+jobs:
+  build_ps4:
+    runs-on: ubuntu-latest
+    container:
+      image: openorbis/openorbis-ps4dev:latest # Uses the pre-built OpenOrbis toolchain environment
+
+    steps:
+      - name: Install Build Dependencies
+        run: |
+          apt-get update && apt-get install -y git make g++ perl nasm
+
+      - name: Checkout Official FBNeo Source
+        run: |
+          git clone --depth=1 https://github.com/finalburnneo/FBNeo.git fbneo
+
+      - name: Compile FBNeo Libretro Core for PS4
+        run: |
+          cd fbneo/src/burn/libretro
+          # OpenOrbis uses standard GNU make; we pass the ps4 platform flag
+          make -f Makefile platform=ps4 -j$(nproc)
+
+      - name: Upload Compiled Core Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fbneo_libretro_ps4
+          path: fbneo/src/burn/libretro/fbneo_libretro_ps4.a # RetroArch PS4 uses static libraries (.a) or elf/prx depending on the build type
