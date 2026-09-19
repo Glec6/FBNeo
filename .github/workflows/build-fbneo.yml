@@ -8,21 +8,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out FBNeo
+      - name: Checkout FBNeo
         uses: actions/checkout@v4
+
+      - name: Show repository structure
+        run: |
+          echo "Repository contents:"
+          ls -la
+          echo
+          echo "Searching for Libretro Makefiles:"
+          find . -iname "*libretro*" -o -iname "makefile" | head -100
 
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential
 
-      - name: Build FBNeo Libretro core
-        working-directory: src/burner/libretro
+      - name: Build FBNeo Libretro
         run: |
-          make -f Makefile USE_X64_DRC=1
+          if [ -f "src/burner/libretro/Makefile" ]; then
+            cd src/burner/libretro
+            make -f Makefile USE_X64_DRC=1
+          elif [ -f "src/burner/libretro/makefile" ]; then
+            cd src/burner/libretro
+            make -f makefile USE_X64_DRC=1
+          else
+            echo "ERROR: Could not find the FBNeo Libretro Makefile."
+            echo "Searching repository:"
+            find . -iname "*libretro*" -o -iname "makefile"
+            exit 1
+          fi
+
+      - name: Find compiled core
+        run: |
+          echo "Looking for compiled .so files:"
+          find . -name "*.so" -type f
 
       - name: Upload FBNeo core
         uses: actions/upload-artifact@v4
         with:
           name: fbneo-libretro-x86_64
-          path: src/burner/libretro/*.so
+          path: "**/*.so"
+          if-no-files-found: error
