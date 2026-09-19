@@ -242,6 +242,7 @@ extern int bDrvOkay;								// 1 if the Driver has been initted okay, and it's o
 extern TCHAR szAppRomPaths[DIRS_MAX][MAX_PATH];
 extern TCHAR szAppQuickPath[MAX_PATH];
 int DrvInit(int nDrvNum, bool bRestore);
+
 int DrvInitCallback();								// Used when Burn library needs to load a game. DrvInit(nBurnSelect, false)
 int DrvExit();
 void NeoCDZRateChangeback();
@@ -392,7 +393,6 @@ void UnloadDrvIcons();
 // neocdsel.cpp
 int NeoCDList_Init();
 extern bool  bNeoCDListScanSub;
-extern bool  bNeoCDListScanOnlyISO;
 extern TCHAR szNeoCDCoverDir[MAX_PATH];
 extern TCHAR szNeoCDPreviewDir[MAX_PATH];
 extern TCHAR szNeoCDGamesDir[MAX_PATH];
@@ -403,10 +403,7 @@ HBITMAP PNGLoadBitmap(HWND hWnd, FILE* fp, int nWidth, int nHeight, int nPreset)
 HBITMAP PNGLoadBitmapBuffer(HWND hWnd, void *buffer, int bufferLength, int nWidth, int nHeight, int nPreset);
 HBITMAP LoadBitmap(HWND hWnd, FILE* fp, int nWidth, int nHeight, int nPreset);
 int NeoCDList_CheckISO(TCHAR* pszFile, void (*pfEntryCallBack)(INT32, TCHAR*));
-TCHAR* ParseCueGetImageFile(const TCHAR* cueFullPath);
-void  FreeNGCDGame(NGCDGAME** ppGame);
-INT32 GetNGCDGameTitle(const UINT32 nGameID, NGCDGAME** ppOutGame, bool bPrintLog = false);
-INT32 cdimgCountChdAudioTracks(TCHAR* pszFile);
+#include "cd_img.h"
 
 // romdata.cpp
 extern bool bRDListScanSub;
