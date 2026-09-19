@@ -1,4 +1,4 @@
-name: Build FBNeo Libretro
+name: Build FBNeo
 
 on:
   workflow_dispatch:
@@ -11,25 +11,10 @@ jobs:
       - name: Checkout FBNeo
         uses: actions/checkout@v4
 
-      - name: Show repository
-        run: |
-          echo "FBNeo repository:"
-          ls -la
-          echo
-          echo "Top-level Makefile:"
-          head -100 makefile
-
-      - name: Install dependencies
+      - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential
-
-      - name: Show Makefile targets
-        run: |
-          make help || true
-          echo
-          echo "Available make targets:"
-          grep -E '^[a-zA-Z0-9_-]+:' makefile | head -100
+          sudo apt-get install -y build-essential nasm
 
       - name: Build FBNeo
         run: |
