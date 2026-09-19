@@ -1,0 +1,28 @@
+name: Build FBNeo Libretro
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out FBNeo
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential
+
+      - name: Build FBNeo Libretro core
+        working-directory: src/burner/libretro
+        run: |
+          make -f Makefile USE_X64_DRC=1
+
+      - name: Upload FBNeo core
+        uses: actions/upload-artifact@v4
+        with:
+          name: fbneo-libretro-x86_64
+          path: src/burner/libretro/*.so
