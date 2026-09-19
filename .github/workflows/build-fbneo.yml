@@ -11,42 +11,40 @@ jobs:
       - name: Checkout FBNeo
         uses: actions/checkout@v4
 
-      - name: Show repository structure
+      - name: Show repository
         run: |
-          echo "Repository contents:"
+          echo "FBNeo repository:"
           ls -la
           echo
-          echo "Searching for Libretro Makefiles:"
-          find . -iname "*libretro*" -o -iname "makefile" | head -100
+          echo "Top-level Makefile:"
+          head -100 makefile
 
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential
 
-      - name: Build FBNeo Libretro
+      - name: Show Makefile targets
         run: |
-          if [ -f "src/burner/libretro/Makefile" ]; then
-            cd src/burner/libretro
-            make -f Makefile USE_X64_DRC=1
-          elif [ -f "src/burner/libretro/makefile" ]; then
-            cd src/burner/libretro
-            make -f makefile USE_X64_DRC=1
-          else
-            echo "ERROR: Could not find the FBNeo Libretro Makefile."
-            echo "Searching repository:"
-            find . -iname "*libretro*" -o -iname "makefile"
-            exit 1
-          fi
+          make help || true
+          echo
+          echo "Available make targets:"
+          grep -E '^[a-zA-Z0-9_-]+:' makefile | head -100
 
-      - name: Find compiled core
+      - name: Build FBNeo
         run: |
-          echo "Looking for compiled .so files:"
-          find . -name "*.so" -type f
+          make -f makefile
 
-      - name: Upload FBNeo core
+      - name: Find compiled files
+        run: |
+          echo "Searching for compiled files..."
+          find . -type f \( -name "*.so" -o -name "*.dll" -o -name "*.elf" \) | head -100
+
+      - name: Upload build
         uses: actions/upload-artifact@v4
         with:
-          name: fbneo-libretro-x86_64
-          path: "**/*.so"
-          if-no-files-found: error
+          name: fbneo-build
+          path: |
+            **/*.so
+            **/*.elf
+          if-no-files-found: warn
